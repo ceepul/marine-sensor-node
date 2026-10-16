@@ -1,0 +1,19 @@
+[Unit]
+Description=Sensor data uploader
+Wants=network-online.target time-sync.target
+After=network-online.target time-sync.target
+
+[Service]
+Type=notify
+User=russell
+WorkingDirectory=/home/russell/marine-sensor-node
+ExecStart=/home/russell/marine-sensor-node/.venv/bin/python -m sensor.uploader
+StateDirectory=sensor
+EnvironmentFile=/etc/sensor/uploader.env
+Environment=PYTHONUNBUFFERED=1
+Restart=always
+RestartSec=5
+WatchdogSec=60
+
+[Install]
+WantedBy=multi-user.target

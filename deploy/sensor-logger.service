@@ -1,0 +1,16 @@
+[Unit]
+Description=Tzone sensor logger
+
+[Service]
+Type=notify
+User=russell
+WorkingDirectory=/home/russell/marine-sensor-node
+ExecStart=/home/russell/marine-sensor-node/.venv/bin/python -m sensor.logger
+StateDirectory=sensor
+Environment=PYTHONUNBUFFERED=1
+Restart=always
+RestartSec=2
+WatchdogSec=90
+
+[Install]
+WantedBy=multi-user.target
