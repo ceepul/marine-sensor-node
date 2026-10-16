@@ -5,6 +5,12 @@ from dataclasses import dataclass
 import minimalmodbus
 import serial
 
+try:
+    import termios  # Linux/macOS only
+    _PORT_ERRORS = (serial.SerialException, OSError, termios.error)
+except ImportError:  # Windows: keep the tests runnable
+    _PORT_ERRORS = (serial.SerialException, OSError)
+
 REG_TEMP, REG_RH = 0, 1     # register map (swap if the breath test disagrees)
 TEMP_RANGE = (-40.0, 80.0)  # rated range: check against the manual
 RH_RANGE = (0.0, 100.0)
@@ -58,7 +64,7 @@ class TzoneSensor:
                 err = NoResponse(str(e))                # they also subclass OSError
             except minimalmodbus.ModbusException as e:
                 err = BadData(str(e))
-            except (serial.SerialException, OSError) as e:
+            except _PORT_ERRORS as e:  # termios.error: device yanked while port open
                 self.close()
                 raise PortMissing(str(e)) from e  # no point retrying a missing port
         raise err

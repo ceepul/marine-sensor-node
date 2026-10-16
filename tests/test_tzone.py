@@ -58,3 +58,11 @@ def test_unplugged_converter_closes_port():
     with pytest.raises(tzone.PortMissing):
         s.read()
     assert s._inst is None  # reopened on the next read
+
+
+def test_unplugged_while_open_closes_port():
+    termios = pytest.importorskip("termios")  # tcflush fails with EIO when the device vanishes
+    s = sensor_with(termios.error(5, "Input/output error"))
+    with pytest.raises(tzone.PortMissing):
+        s.read()
+    assert s._inst is None
