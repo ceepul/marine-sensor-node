@@ -10,17 +10,17 @@ export type Site = {
   timeZone: string;
 };
 
-/** Used for any DEVICE_ID that has no entry in DEVICE_SITES. Replace with your node's location. */
+/** Used for any DEVICE_ID that has no entry in DEVICE_SITES. */
 export const DEFAULT_SITE: Site = {
-  name: "Woods Hole, MA",
-  latitude: 41.5265,
-  longitude: -70.6731,
-  timeZone: "America/New_York",
+  name: "Toronto, ON",
+  latitude: 43.6532,
+  longitude: -79.3832,
+  timeZone: "America/Toronto",
 };
 
 /** Per-node locations, keyed by the DEVICE_ID set in /etc/sensor/uploader.env. */
 export const DEVICE_SITES: Record<string, Site> = {
-  // "marine-node-01": { name: "Harbour pontoon", latitude: 50.3655, longitude: -4.1425, timeZone: "Europe/London" },
+  "russell-node-01": { name: "Toronto, ON", latitude: 43.6532, longitude: -79.3832, timeZone: "America/Toronto" },
 };
 
 export function siteFor(deviceId: string): Site {
