@@ -7,7 +7,6 @@ type Label = { label: string; tone: Tone };
 
 export const NODE_LABELS: Record<NodeStatus, Label> = {
   online: { label: "Online", tone: "good" },
-  delayed: { label: "Delayed", tone: "warning" },
   offline: { label: "Offline", tone: "critical" },
   never: { label: "Waiting", tone: "neutral" },
 };

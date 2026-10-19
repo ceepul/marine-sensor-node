@@ -1,5 +1,8 @@
 import { useSyncExternalStore } from "react";
+import useSWR, { useSWRConfig } from "swr";
 import type { RangeKey } from "./history";
+import { mergeSummary, nextSummaryQuery } from "./summary";
+import type { DeviceSummary, SummaryUpdate } from "./types";
 
 // API keys double as SWR cache keys, so the server-rendered initial data and the
 // browser's polling share one identity.
@@ -10,10 +13,31 @@ export const apiKeys = {
   condensation: (id: string) => `${device(id)}/condensation`,
 };
 
+/** How often the browser asks for the latest readings and node status. */
+export const SUMMARY_POLL_MS = 3_000;
+
 export async function fetchJson<T>(url: string): Promise<T> {
   const res = await fetch(url, { cache: "no-store" });
   if (!res.ok) throw new Error(`Request failed (${res.status})`);
   return res.json() as Promise<T>;
+}
+
+/**
+ * The live summary for a device, polled every SUMMARY_POLL_MS. Each poll fetches only
+ * what's new since the last one and merges it in. The dashboard and the sidebar share
+ * one cache entry, so they also share the requests.
+ */
+export function useSummary(deviceId: string | undefined, fallback?: DeviceSummary) {
+  const { cache } = useSWRConfig();
+  return useSWR<DeviceSummary>(
+    deviceId ? apiKeys.summary(deviceId) : null,
+    async (url: string) => {
+      const prev = (cache.get(url)?.data as DeviceSummary | undefined) ?? fallback;
+      const update = await fetchJson<SummaryUpdate>(prev ? `${url}?${nextSummaryQuery(prev)}` : url);
+      return mergeSummary(prev, update);
+    },
+    { fallbackData: fallback, refreshInterval: SUMMARY_POLL_MS },
+  );
 }
 
 // One shared one-second ticker for every component that shows relative times.

@@ -6,10 +6,9 @@ const NOW = 1_800_000_000;
 describe("nodeStatus", () => {
   it("follows the uploader's heartbeat", () => {
     expect(nodeStatus(null, NOW)).toBe("never");
-    expect(nodeStatus(NOW - 45, NOW)).toBe("online");
-    expect(nodeStatus(NOW - 180, NOW)).toBe("online");
-    expect(nodeStatus(NOW - 181, NOW)).toBe("delayed");
-    expect(nodeStatus(NOW - 601, NOW)).toBe("offline");
+    expect(nodeStatus(NOW - 10, NOW)).toBe("online");
+    expect(nodeStatus(NOW - 30, NOW)).toBe("online");
+    expect(nodeStatus(NOW - 31, NOW)).toBe("offline");
   });
 });
 
@@ -18,7 +17,7 @@ describe("sensorStatus", () => {
     node: "online",
     lastStateEvent: { kind: "ok", ts: NOW - 3600 },
     lastLoggerStart: NOW - 3630,
-    lastReadingAt: NOW - 20,
+    lastReadingAt: NOW - 5,
     now: NOW,
   };
 
@@ -44,7 +43,6 @@ describe("sensorStatus", () => {
 
   it("can't be judged while the node is unreachable", () => {
     expect(sensorStatus({ ...base, node: "offline" }).status).toBe("unknown");
-    expect(sensorStatus({ ...base, node: "delayed" }).status).toBe("unknown");
     expect(sensorStatus({ ...base, node: "never" }).status).toBe("no_data");
   });
 });

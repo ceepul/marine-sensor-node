@@ -5,7 +5,7 @@ import { AwaitingData } from "@/components/awaiting-data";
 import { DashboardLive } from "@/components/dashboard/dashboard-live";
 import { DashboardSkeleton } from "@/components/skeletons";
 import { DEFAULT_RANGE } from "@/lib/history";
-import { getHistory, getSummary, resolveDevice } from "@/lib/queries";
+import { getFullSummary, getHistory, resolveDevice } from "@/lib/queries";
 
 export const metadata: Metadata = { title: "Dashboard" };
 
@@ -24,7 +24,7 @@ async function Dashboard({ searchParams }: Pick<PageProps<"/">, "searchParams">)
   if (!resolved) return <AwaitingData title="Dashboard" />;
 
   const [summary, history] = await Promise.all([
-    getSummary(resolved.deviceId),
+    getFullSummary(resolved.deviceId),
     getHistory(resolved.deviceId, DEFAULT_RANGE),
   ]);
   if (!summary) return <AwaitingData title="Dashboard" />;

@@ -26,7 +26,11 @@ export type LogEntry =
 
 export type DeviceListItem = { id: string; firstSeenAt: number; lastSeenAt: number };
 
-export type DeviceSummary = {
+/** The highest reading and event row ids a client's log has seen. */
+export type LogCursor = { reading: number; event: number };
+
+/** Cheap to read: a handful of rows, so it's fetched on every poll. */
+export type SummaryLive = {
   now: number;
   deviceId: string;
   site: Site;
@@ -35,18 +39,30 @@ export type DeviceSummary = {
   /** Latest logger state change: "ok", "port_missing" or "sensor_silent". */
   lastStateEvent: { kind: string; ts: number } | null;
   lastLoggerStart: number | null;
-  restarts24h: number;
   latest: Reading | null;
+  /** Newest readings and events, merged, newest first. */
+  log: LogEntry[];
+  cursor: LogCursor;
+  /** Status as of `now`. The dashboard re-derives it as time passes between polls. */
+  status: { node: NodeStatus; sensor: SensorStatus; sensorSince: number | null };
+};
+
+/** Scans hours of readings and changes slowly, so polls refresh it only every STATS_EVERY_S. */
+export type SummaryStats = {
+  /** Server time the stats were computed. */
+  statsAt: number;
+  restarts24h: number;
   /** Readings about an hour before `latest`, for the "vs 1 h ago" deltas. */
   hourAgo: Metrics | null;
   /** 15-minute averages over the last 3 hours, for sparklines. */
   trend: (Metrics & { t: number })[];
   readingsLastHour: number;
-  /** Newest readings and events, merged, newest first. */
-  log: LogEntry[];
-  /** Status as of `now`. The dashboard re-derives it as time passes between polls. */
-  status: { node: NodeStatus; sensor: SensorStatus; sensorSince: number | null };
 };
+
+export type DeviceSummary = SummaryLive & SummaryStats;
+
+/** What the summary API returns: with `after`, only newer log entries; stats only when asked for. */
+export type SummaryUpdate = SummaryLive & { stats: SummaryStats | null };
 
 export type RangeStats = { min: number; max: number; avg: number };
 

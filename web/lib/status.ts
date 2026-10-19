@@ -1,13 +1,12 @@
 // Node and sensor health, derived from what the uploader sends. The uploader posts
-// every ~30 s while readings flow and at least every 60-90 s as a heartbeat, so a
+// every ~5 s while readings flow and at least every 10 s as a heartbeat, so a
 // quiet node is a dead (or disconnected) node.
 
-export const READING_INTERVAL_S = 30; // logger INTERVAL on the node
-export const NODE_DELAYED_AFTER_S = 3 * 60;
-export const NODE_OFFLINE_AFTER_S = 10 * 60;
-export const SENSOR_STALE_AFTER_S = 5 * READING_INTERVAL_S;
+export const READING_INTERVAL_S = 5; // logger INTERVAL on the node
+export const NODE_OFFLINE_AFTER_S = 30; // three missed heartbeats
+export const SENSOR_STALE_AFTER_S = 60;
 
-export type NodeStatus = "online" | "delayed" | "offline" | "never";
+export type NodeStatus = "online" | "offline" | "never";
 
 export type SensorStatus =
   | "ok"
@@ -23,10 +22,7 @@ export const SENSOR_STATE_KINDS = ["ok", "port_missing", "sensor_silent"] as con
 
 export function nodeStatus(lastSeenAt: number | null, now: number): NodeStatus {
   if (lastSeenAt == null) return "never";
-  const age = now - lastSeenAt;
-  if (age <= NODE_DELAYED_AFTER_S) return "online";
-  if (age <= NODE_OFFLINE_AFTER_S) return "delayed";
-  return "offline";
+  return now - lastSeenAt <= NODE_OFFLINE_AFTER_S ? "online" : "offline";
 }
 
 export type SensorInputs = {

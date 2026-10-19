@@ -1,13 +1,22 @@
 import { zoneOffset, zonedParts } from "./format";
 
-// Each range is averaged into buckets so a chart never draws more than ~360 points.
+/**
+ * Bucket widths (s) that readings are pre-averaged into as they arrive (see schema.ts),
+ * so a chart reads buckets rather than every reading in its range.
+ */
+export const ROLLUP_RES = [30, 15 * 60] as const;
+export type RollupRes = (typeof ROLLUP_RES)[number];
+
+// Each range draws a similar number of points (96-168), however long it is: `rollup`
+// buckets are read and combined into `bucket`-wide points. The sensor itself only
+// updates every 30 s, so 1H shows every distinct value.
 export const RANGES = {
-  "1h": { label: "1H", seconds: 3600, bucket: 30 },
-  "6h": { label: "6H", seconds: 6 * 3600, bucket: 60 },
-  "24h": { label: "24H", seconds: 24 * 3600, bucket: 5 * 60 },
-  "7d": { label: "7D", seconds: 7 * 86400, bucket: 30 * 60 },
-  "30d": { label: "30D", seconds: 30 * 86400, bucket: 2 * 3600 },
-} as const;
+  "1h": { label: "1H", seconds: 3600, bucket: 30, rollup: 30 }, // reads 120 rows, 120 points
+  "6h": { label: "6H", seconds: 6 * 3600, bucket: 3 * 60, rollup: 30 }, // 720 rows, 120 points
+  "24h": { label: "24H", seconds: 24 * 3600, bucket: 15 * 60, rollup: 15 * 60 }, // 96 rows, 96 points
+  "7d": { label: "7D", seconds: 7 * 86400, bucket: 3600, rollup: 15 * 60 }, // 672 rows, 168 points
+  "30d": { label: "30D", seconds: 30 * 86400, bucket: 6 * 3600, rollup: 15 * 60 }, // 2,880 rows, 120 points
+} as const satisfies Record<string, { label: string; seconds: number; bucket: number; rollup: RollupRes }>;
 
 export type RangeKey = keyof typeof RANGES;
 export const DEFAULT_RANGE: RangeKey = "24h";

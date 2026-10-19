@@ -4,7 +4,7 @@ import { X } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import useSWR from "swr";
-import { apiKeys, fetchJson, useNow } from "@/lib/client";
+import { fetchJson, useNow, useSummary } from "@/lib/client";
 import { NODE_LABELS, SENSOR_LABELS, type Tone } from "@/lib/labels";
 import { nodeStatus, sensorStatus } from "@/lib/status";
 import { readingTime, type DeviceListItem, type DeviceSummary } from "@/lib/types";
@@ -16,10 +16,7 @@ export function SidebarStatus() {
   const requested = useSearchParams().get("device");
   const { data: list } = useSWR<{ devices: DeviceListItem[] }>("/api/devices", fetchJson, { refreshInterval: 60_000 });
   const deviceId = list?.devices.find((d) => d.id === requested)?.id ?? list?.devices[0]?.id;
-  // Same key the dashboard polls, so the two share one request.
-  const { data: summary } = useSWR<DeviceSummary>(deviceId ? apiKeys.summary(deviceId) : null, fetchJson, {
-    refreshInterval: 10_000,
-  });
+  const { data: summary } = useSummary(deviceId); // shares the dashboard's polling
 
   if (list && list.devices.length === 0) {
     return <p className="hidden px-2.5 py-2 text-sm text-ink-3 md:block">No node connected yet</p>;

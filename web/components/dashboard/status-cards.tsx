@@ -22,16 +22,10 @@ export function NodeCard({ summary, serverNow }: Props) {
       <CardHeader
         icon={Cpu}
         title="Raspberry Pi"
-        description="Sensor node · uploads every 30 s"
+        description={`Sensor node · uploads every ${READING_INTERVAL_S} s`}
         actions={<StatusPill tone={tone} label={label} />}
       />
       <div className="space-y-4 px-5 pt-4 pb-5">
-        {status === "delayed" && (
-          <Notice tone="warning">
-            No upload for {quietFor}. After a network error the uploader backs off and retries; readings wait in the
-            Pi&apos;s local buffer meanwhile.
-          </Notice>
-        )}
         {status === "offline" && (
           <Notice tone="critical" title={`No contact for ${quietFor}`}>
             Check the Pi&apos;s power and network. If only the network is down, readings are buffered on the Pi and
@@ -103,7 +97,7 @@ export function SensorCard({ summary, serverNow }: Props) {
             stopped.
           </Notice>
         )}
-        {status === "starting" && <Notice tone="neutral">The logger just restarted; the first reading follows within 30 s.</Notice>}
+        {status === "starting" && <Notice tone="neutral">The logger just restarted; the first reading follows within {READING_INTERVAL_S} s.</Notice>}
         {status === "unknown" && (
           <Notice tone="neutral">The sensor can&apos;t be checked while the node is unreachable.</Notice>
         )}

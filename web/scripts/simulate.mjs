@@ -18,13 +18,13 @@ const { values: opts } = parseArgs({
     device: { type: "string", default: process.env.DEVICE_ID ?? "demo-node" },
     hours: { type: "string", default: "24" },
     "dew-point": { type: "string", default: "6" },
-    interval: { type: "string", default: "30" },
+    interval: { type: "string", default: "5" },
     tz: { type: "string", default: "America/New_York" },
     once: { type: "boolean", default: false },
   },
 });
 
-const STEP = 30; // the logger reads every 30 s
+const STEP = 5; // the logger reads every 5 s
 const BATCH = 200; // and the uploader sends at most 200 rows per request
 const interval = Number(opts.interval);
 const dewBase = Number(opts["dew-point"]);
