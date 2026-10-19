@@ -15,9 +15,9 @@ DEVICE_ID = os.environ["DEVICE_ID"]
 DB_PATH = os.path.join(os.environ.get("STATE_DIRECTORY", "."), "readings.db")
 
 BATCH = 200          # rows per request
-SEND_EVERY = 30.0    # normal upload interval (s)
-HEARTBEAT = 60.0     # post even with no data, so the server knows the Pi is alive
-MIN_DELAY, MAX_DELAY = 5.0, 300.0  # retry backoff range (s)
+SEND_EVERY = 5.0     # normal upload interval (s)
+HEARTBEAT = 10.0     # post even with no data, so the server knows the Pi is alive
+MIN_DELAY, MAX_DELAY = 5.0, 10.0  # retry backoff range (s)
 
 
 def wait(seconds: float):
@@ -62,7 +62,7 @@ def main():
             why = why if resp is None else f"HTTP {resp.status_code}"
             print(f"upload failed ({why}), retry in {delay:.0f} s")
             wait(delay)
-            delay = min(delay * 2, MAX_DELAY)  # back off: 5, 10, 20 ... 300 s
+            delay = min(delay * 2, MAX_DELAY)  # back off: 5 s, then every 10 s
 
 
 if __name__ == "__main__":

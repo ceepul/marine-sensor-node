@@ -1,4 +1,4 @@
-"""Service: read the sensor every 30 s and store readings locally. Never touches the network."""
+"""Service: read the sensor every 5 s and store readings locally. Never touches the network."""
 import os
 import signal
 import sys
@@ -8,7 +8,7 @@ from .notify import notify
 from .store import Store
 from .tzone import BadData, NoResponse, PortMissing, TzoneSensor
 
-INTERVAL = 30.0  # matches the sensor's own 30 s update: polling faster only repeats values
+INTERVAL = 5.0  # the sensor only updates every 30 s; reading faster shows quickly that it's still answering
 DB_PATH = os.path.join(os.environ.get("STATE_DIRECTORY", "."), "readings.db")  # systemd sets STATE_DIRECTORY
 
 
