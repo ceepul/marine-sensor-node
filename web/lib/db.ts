@@ -5,7 +5,7 @@ import path from "node:path";
 import { createClient, type Client } from "@libsql/client";
 
 // libSQL speaks SQLite: a local file by default (zero setup), or a hosted Turso
-// database when DATABASE_URL points at one. Serverless hosts need the hosted option.
+// database when DATABASE_TURSO_DATABASE_URL points at one. Serverless hosts need the hosted option.
 const DEFAULT_URL = "file:data/sensor.db";
 
 const SCHEMA = `
@@ -57,14 +57,18 @@ type Connection = { client: Client; ready: Promise<void> };
 const cache = globalThis as typeof globalThis & { sensorDb?: Connection };
 
 function connect(): Connection {
-  const url = process.env.DATABASE_URL || DEFAULT_URL;
+  // Set by the Vercel Turso integration.
+  const url = process.env.DATABASE_TURSO_DATABASE_URL || DEFAULT_URL;
+  const authToken = process.env.DATABASE_TURSO_AUTH_TOKEN;
   if (url.startsWith("file:")) {
     if (process.env.VERCEL) {
-      throw new Error("DATABASE_URL is not set. Serverless hosts can't keep a local SQLite file; point it at a Turso database.");
+      throw new Error(
+        "DATABASE_TURSO_DATABASE_URL is not set. Serverless hosts can't keep a local SQLite file; connect the Turso integration.",
+      );
     }
     mkdirSync(path.dirname(path.resolve(url.slice("file:".length))), { recursive: true });
   }
-  const client = createClient({ url, authToken: process.env.DATABASE_AUTH_TOKEN });
+  const client = createClient({ url, authToken });
   const ready = client.executeMultiple(SCHEMA);
   ready.catch(() => {
     if (cache.sensorDb?.client === client) cache.sensorDb = undefined; // retry on the next request

@@ -11,7 +11,7 @@ export default function ErrorPage({ error, retry }: { error: unknown; retry: () 
     <div className="mx-auto max-w-lg py-20 text-center">
       <h1 className="text-lg font-semibold text-ink">Couldn&apos;t load this page</h1>
       <p className="mt-2 text-sm text-ink-2">
-        The database or the weather service didn&apos;t respond. If this keeps happening, check DATABASE_URL and the server
+        The database or the weather service didn&apos;t respond. If this keeps happening, check DATABASE_TURSO_DATABASE_URL and the server
         logs.
       </p>
       <button

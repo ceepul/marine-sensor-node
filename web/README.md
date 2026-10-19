@@ -39,15 +39,15 @@ The node's location (used for the forecast, and the time zone everything is show
 | Variable              | Purpose                                                                                                            |
 | --------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | `INGEST_TOKEN`        | Shared secret the node sends as `Authorization: Bearer …`. Required in production (uploads are refused without it). |
-| `DATABASE_URL`        | Defaults to `file:data/sensor.db`. Serverless hosts need a hosted libSQL database, e.g. `libsql://<db>-<org>.turso.io`. |
-| `DATABASE_AUTH_TOKEN` | Token for the hosted database.                                                                                      |
+| `DATABASE_TURSO_DATABASE_URL` | Hosted Turso database URL. Unset locally, which uses `data/sensor.db`. |
+| `DATABASE_TURSO_AUTH_TOKEN`   | Token for the hosted database.                                         |
 
 See [`.env.example`](.env.example).
 
 ## Deploy (Vercel + Turso, both free tiers)
 
-1. Create the database: `turso db create marine-sensor`, then get `turso db show --url marine-sensor` and `turso db tokens create marine-sensor`.
-2. Import the repo into Vercel with **Root Directory** set to `web`, and add `INGEST_TOKEN`, `DATABASE_URL` and `DATABASE_AUTH_TOKEN`.
+1. Import the repo into Vercel with **Root Directory** set to `web`, and add `INGEST_TOKEN`.
+2. Add the **Turso** integration to the project with the env prefix `DATABASE`; it sets `DATABASE_TURSO_DATABASE_URL` and `DATABASE_TURSO_AUTH_TOKEN`.
 3. Point the Pi at `https://<project>.vercel.app/api/ingest`.
 
 Tables are created automatically on first use. Any Node host with a persistent disk can skip Turso and keep the default SQLite file.

@@ -34,7 +34,7 @@ yarn-error.log*
 .env*
 !.env.example
 
-# local SQLite database (default DATABASE_URL)
+# local SQLite database (used when DATABASE_TURSO_DATABASE_URL is unset)
 /data/
 
 # vercel
