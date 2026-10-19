@@ -1,17 +1,13 @@
 "use client";
 
 import { MapPin } from "lucide-react";
-import useSWR from "swr";
-import { apiKeys, fetchJson, useSummary } from "@/lib/client";
-import type { CondensationState, DeviceHistory, DeviceListItem, DeviceSummary } from "@/lib/types";
-import { RiskBanner } from "../condensation/risk-banner";
+import { useSummary } from "@/lib/client";
+import type { DeviceHistory, DeviceListItem, DeviceSummary } from "@/lib/types";
 import { DevicePicker } from "../device-picker";
 import { PageHeader } from "../ui";
 import { HistoryPanel } from "./history-panel";
 import { KpiRow } from "./kpi-row";
 import { LiveLog } from "./live-log";
-
-const CONDENSATION_POLL_MS = 120_000; // the forecast itself only refreshes every 30 min
 
 export function DashboardLive({
   devices,
@@ -25,9 +21,6 @@ export function DashboardLive({
   const deviceId = initialSummary.deviceId;
   const serverNow = initialSummary.now; // what SSR rendered against; see useNow
   const { data: summary = initialSummary } = useSummary(deviceId, initialSummary);
-  const { data: condensation } = useSWR<CondensationState>(apiKeys.condensation(deviceId), fetchJson, {
-    refreshInterval: CONDENSATION_POLL_MS,
-  });
   const timeZone = summary.site.timeZone;
 
   return (
@@ -37,8 +30,6 @@ export function DashboardLive({
         description={<SiteLine name={summary.site.name} deviceId={deviceId} />}
         actions={<DevicePicker devices={devices} value={deviceId} />}
       />
-
-      {condensation && <RiskBanner state={condensation} />}
 
       <KpiRow summary={summary} serverNow={serverNow} />
 
